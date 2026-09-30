@@ -44,7 +44,8 @@ Normal boot runs `ota_0` (your Marauder). To update you jump into `factory`
   **`Marauder-OTA`** (password `marauder1234`), web uploader at
   **`http://192.168.4.1`**. Writes the uploaded `.bin` to the next OTA slot
   (`ota_0`), sets it as boot, reboots. A **"Boot app"** button exits without
-  flashing.
+  flashing. Uses the **synchronous `WebServer`** from the core (no `AsyncTCP`
+  dependency) — see the note below.
 - `partitions.csv` — the `factory` + `ota_0` layout above.
 - `enter_recovery.ino.inc` — drop‑in function for **your main app** to jump into
   recovery from a menu (shows AP/URL on screen, then reboots into `factory`).
@@ -84,5 +85,14 @@ esptool --chip <chip> --port <PORT> --baud 460800 write_flash \
   app shows the AP name/URL on screen right before rebooting into it.
 - Only the **app** partition content is uploaded — same `.bin` your normal build
   produces.
+- **Why the synchronous `WebServer` and not `ESPAsyncWebServer`:** on **ESP‑IDF
+  5.x** (Arduino ESP32 core 3.x), an async server backed by `AsyncTCP` can abort
+  at boot with `assert failed: tcp_alloc ... Required to lock TCPIP core
+  functionality!` — lwIP is built with core‑locking and the TCP PCB gets
+  allocated outside the TCPIP thread. The built‑in synchronous `WebServer`
+  (WiFiServer/lwIP sockets) avoids that entirely and is plenty for a one‑shot
+  uploader, so the recovery uses it. If you insist on the async server, wrap the
+  offending calls in `LOCK_TCPIP_CORE()` / `UNLOCK_TCPIP_CORE()` or use an
+  `AsyncTCP` build that is core‑locking aware.
 - License: MIT. Do whatever, credit appreciated. Not affiliated with the
   official ESP32 Marauder.
