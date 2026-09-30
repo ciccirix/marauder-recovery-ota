@@ -4,6 +4,11 @@ A tiny **recovery firmware** that lets you flash your main Marauder (or any big
 ESP32 app) **over WiFi**, even on a **4 MB** module where a classic dual‑OTA
 scheme doesn't fit.
 
+> ⚡ **Flash it from your browser:** [**ciccirix.github.io/flasher**](https://ciccirix.github.io/flasher)
+> — one‑click Web Serial installer (Chrome/Edge), no toolchain needed. Pick
+> *Marauder C5* to write the full recovery‑OTA image over USB the first time;
+> after that you update over WiFi.
+
 Born on an **ESP32‑C5** whose USB‑data lines died (board still powered, screen
 on, but no COM port on either USB‑C connector). With this, you never depend on a
 flaky USB port again: open the recovery AP from your phone, upload the `.bin`,
